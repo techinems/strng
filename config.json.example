@@ -1,0 +1,66 @@
+{
+  "locations": [
+    {
+      "name": "Anderson Field",
+      "abbr": "AF"
+    },
+    {
+      "name": "Darrin Communications Center",
+      "abbr": "DCC"
+    },
+    {
+      "name": "East Campus Athletic Village",
+      "abbr": "ECAV"
+    },
+    {
+      "name": "EMPAC",
+      "abbr": "EMPAC"
+    },
+    {
+      "name": "Houston Field House",
+      "abbr": "HFH"
+    },
+    {
+      "name": "'86 Field",
+      "abbr": "86F"
+    },
+    {
+      "name": "'87 Gymnasium'",
+      "abbr": "87G"
+    }
+  ],
+  "comment": "time_divisions is in months where January = 0",
+  "month_divisions": [
+    {
+      "F": {
+        "start": 9,
+        "end": 1
+      }
+    },
+    {
+      "S": {
+        "start": 2,
+        "end": 8
+      }
+    }
+  ],
+  "comment2": "mush_months is a timeframe (in months) where the program will prompt the user to specify which month division they want",
+  "mush_months": [
+    {
+      "start": 1,
+      "end": 2,
+      "options": [
+        "F",
+        "S"
+      ]
+    },
+    {
+      "start": 8,
+      "end": 9,
+      "options": [
+        "S",
+        "F"
+      ]
+    }
+  ]
+}

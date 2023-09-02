@@ -1,0 +1,19 @@
+{
+  "name": "strng",
+  "version": "0.0.1",
+  "description": "strng generates run numbers for EMS standby events",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/techinems/strng.git"
+  },
+  "author": "Dan Bruce <dan@ddbruce.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/techinems/strng/issues"
+  },
+  "homepage": "https://github.com/techinems/strng#readme"
+}
