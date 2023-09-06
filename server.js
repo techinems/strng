@@ -27,9 +27,23 @@ const checkAndMaybeDetermineDivision = () => {
     }
   }
   return 1;
+  // if 1, we need to then make sure that the current
+  // month is a mush month and then ask the user which
+  // division they'd like to use
+};
+
+// this is just going to hold some code so I don't have to write it later
+// when I actually need it
+const printLocations = () => {
+  let output = "";
+  for (const location of config.locations) {
+    output += `${location.name} (${location.abbr})\n`;
+  }
+  return output.trim();
 };
 
 console.log(data);
 console.log(checkGetAndSetYear());
 console.log(checkAndMaybeDetermineDivision());
 console.log(data);
+console.log(printLocations());
