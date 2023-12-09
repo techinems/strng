@@ -32,16 +32,14 @@
   "comment": "time_divisions is in months where January = 0",
   "month_divisions": [
     {
-      "F": {
-        "start": 9,
-        "end": 1
-      }
+      "abbr": "F",
+      "start": 9,
+      "end": 1
     },
     {
-      "S": {
-        "start": 2,
-        "end": 8
-      }
+      "abbr": "S",
+      "start": 2,
+      "end": 8
     }
   ],
   "comment2": "mush_months is a timeframe (in months) where the program will prompt the user to specify which month division they want",

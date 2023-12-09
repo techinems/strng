@@ -15,7 +15,7 @@ const monthBetween = (month, start, end) => {
   if (start <= end)
     return month >= start && month <= end;
   else
-    return month >= start || month <=end;
+    return month >= start || month <= end;
 };
 
 const checkAndMaybeDetermineDivision = () => {
