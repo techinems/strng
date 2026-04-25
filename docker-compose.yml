@@ -1,0 +1,13 @@
+services:
+  strng:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: strng
+    ports:
+      - "3000:3000"
+    volumes:
+      # Create config.json and data.json from the example files before starting.
+      - ./config.json:/app/config.json:ro
+      - ./data.json:/app/data.json
+    restart: unless-stopped
