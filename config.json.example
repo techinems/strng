@@ -1,4 +1,8 @@
 {
+  "port": 3000,
+  "password": "changeme",
+  "admin_password": "adminchangeme",
+  "session_secret": "replace-with-a-long-random-string",
   "locations": [
     {
       "name": "Anderson Field",

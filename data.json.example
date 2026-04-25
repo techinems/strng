@@ -1,1 +1,13 @@
-{ "current_division": "", "current_year": "", "locations": [] }
+{
+  "current_division": "",
+  "current_year": "",
+  "locations": [
+    { "abbr": "AF", "next_run": 1 },
+    { "abbr": "DCC", "next_run": 1 },
+    { "abbr": "ECAV", "next_run": 1 },
+    { "abbr": "EMPAC", "next_run": 1 },
+    { "abbr": "HFH", "next_run": 1 },
+    { "abbr": "86F", "next_run": 1 },
+    { "abbr": "87G", "next_run": 1 }
+  ]
+}
