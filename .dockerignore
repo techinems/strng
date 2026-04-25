@@ -1,0 +1,7 @@
+node_modules/
+.git/
+config.json
+data.json
+*.example
+.eslintrc.json
+.prettierignore
