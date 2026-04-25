@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const express = require("express");
@@ -12,6 +13,17 @@ const PORT = config.port || 3000;
 // Persist data to disk
 const saveData = () => {
   fs.writeFileSync("data.json", JSON.stringify(data, null, 2));
+};
+
+// Constant-time string comparison to prevent timing attacks
+const safeCompare = (a, b) => {
+  const bufA = Buffer.from(String(a));
+  const bufB = Buffer.from(String(b));
+  if (bufA.length !== bufB.length) {
+    crypto.timingSafeEqual(bufA, bufA); // keep timing constant
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
 };
 
 // Helper: update current_year in data; returns true if it changed
@@ -75,8 +87,20 @@ app.use(session({
   secret: config.session_secret,
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true },
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  },
 }));
+
+// Attach a per-session CSRF token to res.locals for use in all templates
+app.use((req, res, next) => {
+  if (!req.session.csrfToken) {
+    req.session.csrfToken = crypto.randomBytes(32).toString("hex");
+  }
+  res.locals.csrfToken = req.session.csrfToken;
+  next();
+});
 
 // Auth guards
 const requireUser = (req, res, next) => {
@@ -93,6 +117,14 @@ const requireAdmin = (req, res, next) => {
   res.redirect("/admin/login");
 };
 
+// CSRF validation for state-changing POST requests
+const validateCsrf = (req, res, next) => {
+  if (!safeCompare(req.body._csrf || "", req.session.csrfToken || "")) {
+    return res.status(403).send("Invalid CSRF token.");
+  }
+  next();
+};
+
 // ── User routes ────────────────────────────────────────────────────────────
 
 app.get("/login", (req, res) => {
@@ -100,17 +132,19 @@ app.get("/login", (req, res) => {
   res.render("login", { error: null });
 });
 
-app.post("/login", (req, res) => {
-  if (req.body.password === config.password) {
+app.post("/login", validateCsrf, (req, res) => {
+  if (safeCompare(req.body.password, config.password)) {
     req.session.role = "user";
     return res.redirect("/");
   }
   res.render("login", { error: "Incorrect password." });
 });
 
-app.post("/logout", (req, res) => {
-  req.session.destroy();
-  res.redirect("/login");
+app.post("/logout", validateCsrf, (req, res) => {
+  req.session.destroy((err) => {
+    if (err) { console.error("Session destroy error:", err); }
+    res.redirect("/login");
+  });
 });
 
 app.get("/", requireUser, (req, res) => {
@@ -128,7 +162,7 @@ app.get("/", requireUser, (req, res) => {
   });
 });
 
-app.post("/generate", requireUser, (req, res) => {
+app.post("/generate", requireUser, validateCsrf, (req, res) => {
   checkGetAndSetYear();
   ensureLocations();
 
@@ -187,17 +221,19 @@ app.get("/admin/login", (req, res) => {
   res.render("admin/login", { error: null });
 });
 
-app.post("/admin/login", (req, res) => {
-  if (req.body.password === config.admin_password) {
+app.post("/admin/login", validateCsrf, (req, res) => {
+  if (safeCompare(req.body.password, config.admin_password)) {
     req.session.role = "admin";
     return res.redirect("/admin");
   }
   res.render("admin/login", { error: "Incorrect admin password." });
 });
 
-app.post("/admin/logout", (req, res) => {
-  req.session.destroy();
-  res.redirect("/admin/login");
+app.post("/admin/logout", validateCsrf, (req, res) => {
+  req.session.destroy((err) => {
+    if (err) { console.error("Session destroy error:", err); }
+    res.redirect("/admin/login");
+  });
 });
 
 app.get("/admin", requireAdmin, (req, res) => {
@@ -215,7 +251,7 @@ app.get("/admin", requireAdmin, (req, res) => {
   });
 });
 
-app.post("/admin/set", requireAdmin, (req, res) => {
+app.post("/admin/set", requireAdmin, validateCsrf, (req, res) => {
   checkGetAndSetYear();
   ensureLocations();
 

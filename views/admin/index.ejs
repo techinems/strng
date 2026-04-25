@@ -41,6 +41,7 @@
   </p>
 
   <form method="post" action="/admin/set">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <table>
       <thead>
         <tr>
@@ -81,6 +82,7 @@
   <div class="actions">
     <a href="/">Generate run number</a>
     <form method="post" action="/admin/logout" style="margin:0">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button type="submit"
         style="background:none;border:none;padding:0;color:#06c;cursor:pointer;font-size:0.9rem">
         Log out
