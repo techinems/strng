@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>strng &ndash; Admin</title>
+  <style>
+    body { font-family: sans-serif; max-width: 560px; margin: 60px auto; padding: 0 1rem; }
+    h1 { margin-bottom: 0; }
+    .subtitle { color: #555; margin-top: 0.25rem; margin-bottom: 1.5rem; }
+    .meta { font-size: 0.9rem; color: #444; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+    th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid #ddd; }
+    th { background: #f4f4f4; }
+    input[type="number"] { width: 90px; padding: 0.35rem; }
+    button[type="submit"] { padding: 0.5rem 1.5rem; }
+    .success { color: #060; margin-bottom: 1rem; }
+    .error { color: #c00; margin-bottom: 1rem; }
+    .actions { margin-top: 2rem; font-size: 0.9rem; display: flex; gap: 1.5rem; align-items: center; }
+  </style>
+</head>
+<body>
+  <h1>strng</h1>
+  <p class="subtitle">Admin panel</p>
+
+  <p class="meta">
+    Semester: <strong><%= currentDivision %><%= currentYear %></strong>
+  </p>
+
+  <% if (success) { %>
+    <p class="success"><%= success %></p>
+  <% } %>
+  <% if (error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+
+  <h2>Next run numbers</h2>
+  <p style="font-size:0.9rem;color:#555">
+    The next generated run number for each location will use the value below.
+    Run numbers follow the format <code>LOC-S25001</code>.
+  </p>
+
+  <form method="post" action="/admin/set">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <table>
+      <thead>
+        <tr>
+          <th>Location</th>
+          <th>Next #</th>
+          <th>Preview</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (const loc of locations) { %>
+          <% const locData = dataLocations.find((l) => l.abbr === loc.abbr); %>
+          <% const nextRun = locData ? locData.next_run : 1; %>
+          <% const preview = loc.abbr + "-" + currentDivision + currentYear
+               + nextRun.toString().padStart(3, "0"); %>
+          <tr>
+            <td><%= loc.name %> (<%= loc.abbr %>)</td>
+            <td>
+              <input type="number" name="next_run_<%= loc.abbr %>"
+                value="<%= nextRun %>" min="1" required>
+            </td>
+            <td style="font-family:monospace;color:#555"><%= preview %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <% if (mushOptions) { %>
+      <p style="font-size:0.9rem;color:#555">
+        Note: preview uses the first available semester option
+        (<strong><%= mushOptions[0] %></strong>).
+        The actual semester is selected at generation time.
+      </p>
+    <% } %>
+
+    <button type="submit">Save</button>
+  </form>
+
+  <div class="actions">
+    <a href="/">Generate run number</a>
+    <form method="post" action="/admin/logout" style="margin:0">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit"
+        style="background:none;border:none;padding:0;color:#06c;cursor:pointer;font-size:0.9rem">
+        Log out
+      </button>
+    </form>
+  </div>
+</body>
+</html>

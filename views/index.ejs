@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>strng &ndash; Generate Run Number</title>
+  <style>
+    body { font-family: sans-serif; max-width: 480px; margin: 60px auto; padding: 0 1rem; }
+    h1 { margin-bottom: 0; }
+    .subtitle { color: #555; margin-top: 0.25rem; margin-bottom: 1.5rem; }
+    .meta { font-size: 0.9rem; color: #444; margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+    select { width: 100%; padding: 0.5rem; box-sizing: border-box; margin-bottom: 1rem; }
+    button { padding: 0.5rem 1.5rem; }
+    .result {
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: #eef6ee;
+      border-left: 4px solid #4a4;
+      font-size: 1.4rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+    }
+    .error { color: #c00; margin-bottom: 1rem; }
+    .actions { margin-top: 2rem; font-size: 0.9rem; display: flex; gap: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>strng</h1>
+  <p class="subtitle">Run number generator</p>
+
+  <p class="meta">
+    Semester: <strong><%= currentDivision %><%= currentYear %></strong>
+  </p>
+
+  <% if (runNumber) { %>
+    <div class="result"><%= runNumber %></div>
+  <% } %>
+
+  <% if (error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+
+  <form method="post" action="/generate">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label for="location">Location</label>
+    <select id="location" name="location" required>
+      <% for (const loc of locations) { %>
+        <option value="<%= loc.abbr %>"><%= loc.name %> (<%= loc.abbr %>)</option>
+      <% } %>
+    </select>
+
+    <% if (mushOptions) { %>
+      <label for="division">Semester</label>
+      <select id="division" name="division" required>
+        <% for (const opt of mushOptions) { %>
+          <option value="<%= opt %>"><%= opt %></option>
+        <% } %>
+      </select>
+    <% } %>
+
+    <button type="submit">Generate run number</button>
+  </form>
+
+  <div class="actions">
+    <% if (role === "admin") { %>
+      <a href="/admin">Admin panel</a>
+    <% } %>
+    <form method="post" action="/logout" style="margin:0">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit"
+        style="background:none;border:none;padding:0;color:#06c;cursor:pointer;font-size:0.9rem">
+        Log out
+      </button>
+    </form>
+  </div>
+</body>
+</html>
