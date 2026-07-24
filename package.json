@@ -3,9 +3,13 @@
   "version": "0.0.1",
   "description": "strng generates run numbers for EMS standby events",
   "main": "server.js",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint .",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -23,6 +27,9 @@
     "express-session": "^1.19.0"
   },
   "devDependencies": {
-    "eslint": "^8.57.1"
+    "@eslint/js": "^9.39.0",
+    "eslint": "^9.39.0",
+    "globals": "^16.5.0",
+    "jest": "^30.2.0"
   }
 }
