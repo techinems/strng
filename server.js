@@ -3,6 +3,12 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const session = require("express-session");
+const {
+  safeCompare,
+  formatRunNumber,
+  getCurrentDivision: divisionForMonth,
+  getMushOptions: mushOptionsForMonth,
+} = require("./lib");
 
 const config = JSON.parse(fs.readFileSync("config.json"));
 let data = JSON.parse(fs.readFileSync("data.json"));
@@ -15,17 +21,6 @@ const saveData = () => {
   fs.writeFileSync("data.json", JSON.stringify(data, null, 2));
 };
 
-// Constant-time string comparison to prevent timing attacks
-const safeCompare = (a, b) => {
-  const bufA = Buffer.from(String(a));
-  const bufB = Buffer.from(String(b));
-  if (bufA.length !== bufB.length) {
-    crypto.timingSafeEqual(bufA, bufA); // keep timing constant
-    return false;
-  }
-  return crypto.timingSafeEqual(bufA, bufB);
-};
-
 // Helper: update current_year in data; returns true if it changed
 const checkGetAndSetYear = () => {
   const year = new Date().getFullYear().toString().substring(2);
@@ -34,35 +29,13 @@ const checkGetAndSetYear = () => {
   return true;
 };
 
-// Helper: true if month is in the range [start, end] (wraps around year)
-const monthBetween = (month, start, end) => {
-  if (start <= end) {
-    return month >= start && month <= end;
-  }
-  return month >= start || month <= end;
-};
-
 // Returns the division abbreviation for the current month, or null if mush
-const getCurrentDivision = () => {
-  const month = new Date().getMonth();
-  for (const division of config.month_divisions) {
-    if (monthBetween(month, division.start, division.end)) {
-      return division.abbr;
-    }
-  }
-  return null;
-};
+const getCurrentDivision = () =>
+  divisionForMonth(new Date().getMonth(), config.month_divisions);
 
 // Returns the list of valid division options during a mush month, or null
-const getMushOptions = () => {
-  const month = new Date().getMonth();
-  for (const mush of config.mush_months) {
-    if (monthBetween(month, mush.start, mush.end)) {
-      return mush.options;
-    }
-  }
-  return null;
-};
+const getMushOptions = () =>
+  mushOptionsForMonth(new Date().getMonth(), config.mush_months);
 
 // Ensure every configured location exists in data.locations
 const ensureLocations = () => {
@@ -71,12 +44,6 @@ const ensureLocations = () => {
       data.locations.push({ abbr: loc.abbr, next_run: 1 });
     }
   }
-};
-
-// Format: <LOC>-<DIV><YY><NNN> — e.g. DCC-S25001
-const formatRunNumber = (year, division, locAbbr, num) => {
-  const padded = num.toString().padStart(3, "0");
-  return `${locAbbr}-${division}${year}${padded}`;
 };
 
 // Middleware
